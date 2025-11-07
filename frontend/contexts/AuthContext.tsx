@@ -67,15 +67,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
 
       if (!response.ok) {
-        throw new Error("Login failed");
+        const errorText = await response.text();
+        console.error("Login failed:", response.status, errorText);
+        throw new Error("Login failed: " + errorText);
       }
 
       const data = await response.json();
+      console.log("Login successful, received data:", { 
+        hasToken: !!data.token, 
+        tokenLength: data.token?.length,
+        user: data.user 
+      });
+      
+      if (!data.token) {
+        throw new Error("No token received from server");
+      }
+      
       setToken(data.token);
       setUser(data.user);
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
+      
+      console.log("Token stored in localStorage and state");
 
       router.push("/dashboard");
     } catch (error) {

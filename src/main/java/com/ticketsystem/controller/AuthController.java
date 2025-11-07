@@ -36,37 +36,51 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
         try {
-            // Simple hardcoded authentication for admin user
+            // 1) Special-case built-in admin for demo
             if ("admin".equals(loginRequest.getUsername()) && "admin123".equals(loginRequest.getPassword())) {
-                // Create a proper UserDetails object
-                org.springframework.security.core.userdetails.UserDetails userDetails = 
-                    org.springframework.security.core.userdetails.User.builder()
-                        .username("admin")
-                        .password("admin123")
-                        .roles("ADMIN")
-                        .build();
-                
-                // Create a simple authentication object
+                org.springframework.security.core.userdetails.UserDetails userDetails =
+                        org.springframework.security.core.userdetails.User.builder()
+                                .username("admin")
+                                .password("admin123")
+                                .roles("ADMIN")
+                                .build();
+
                 Authentication authentication = new UsernamePasswordAuthenticationToken(
-                    userDetails, 
-                    "admin123", 
-                    userDetails.getAuthorities()
+                        userDetails,
+                        "admin123",
+                        userDetails.getAuthorities()
                 );
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 String jwt = tokenProvider.generateToken(authentication);
 
-                // Create UserDto
                 UserDto userDto = new UserDto(1L, "admin", "Administrator", "admin@example.com", Role.ADMIN);
 
                 Map<String, Object> body = new HashMap<>();
                 body.put("token", jwt);
                 body.put("user", userDto);
-
                 return ResponseEntity.ok(body);
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
             }
+
+            // 2) Authenticate against database for regular users (USER, SUPPORT_AGENT, etc.)
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getUsername(),
+                            loginRequest.getPassword()
+                    )
+            );
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = tokenProvider.generateToken(authentication);
+
+            User user = userService.findByUsername(loginRequest.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found: " + loginRequest.getUsername()));
+            UserDto userDto = new UserDto(user.getId(), user.getUsername(), user.getFullName(), user.getEmail(), user.getRole());
+
+            Map<String, Object> body = new HashMap<>();
+            body.put("token", jwt);
+            body.put("user", userDto);
+            return ResponseEntity.ok(body);
         } catch (Exception e) {
             // Non-auth error → 500
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Login failed: " + e.getMessage());

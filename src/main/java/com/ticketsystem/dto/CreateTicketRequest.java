@@ -14,6 +14,9 @@ public class CreateTicketRequest {
     @NotNull(message = "Priority is required")
     private Priority priority;
 
+    // Optional external issue linkage
+    private Long issueId;
+
     // Constructors
     public CreateTicketRequest() {}
 
@@ -32,4 +35,7 @@ public class CreateTicketRequest {
 
     public Priority getPriority() { return priority; }
     public void setPriority(Priority priority) { this.priority = priority; }
+
+    public Long getIssueId() { return issueId; }
+    public void setIssueId(Long issueId) { this.issueId = issueId; }
 }

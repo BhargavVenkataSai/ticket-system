@@ -20,6 +20,7 @@ public class TicketDto {
     private LocalDateTime resolvedAt;
     private Integer rating;
     private String feedback;
+    private Long issueId;
 
     // Constructors
     public TicketDto() {}
@@ -74,4 +75,7 @@ public class TicketDto {
 
     public String getFeedback() { return feedback; }
     public void setFeedback(String feedback) { this.feedback = feedback; }
+
+    public Long getIssueId() { return issueId; }
+    public void setIssueId(Long issueId) { this.issueId = issueId; }
 }

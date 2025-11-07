@@ -52,6 +52,10 @@ public class Ticket {
     @Column(columnDefinition = "TEXT")
     private String feedback;
 
+    // Optional linkage to an external Issue entity/system
+    @Column(name = "issue_id")
+    private Long issueId;
+
     // Constructors
     public Ticket() {
         this.createdAt = LocalDateTime.now();
@@ -116,6 +120,9 @@ public class Ticket {
 
     public String getFeedback() { return feedback; }
     public void setFeedback(String feedback) { this.feedback = feedback; }
+
+    public Long getIssueId() { return issueId; }
+    public void setIssueId(Long issueId) { this.issueId = issueId; }
 
     // Helper methods
     public void addComment(Comment comment) {

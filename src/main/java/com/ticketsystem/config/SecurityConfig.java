@@ -43,12 +43,12 @@ public class SecurityConfig {
       .csrf(csrf -> csrf.disable())
       .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
       .exceptionHandling(e -> e
-        .authenticationEntryPoint((req,res,ex) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED))
-        .accessDeniedHandler((req,res,ex) -> res.sendError(HttpServletResponse.SC_FORBIDDEN))
+        .authenticationEntryPoint((req, res, ex) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED))
+        .accessDeniedHandler((req, res, ex) -> res.sendError(HttpServletResponse.SC_FORBIDDEN))
       )
       .authorizeHttpRequests(auth -> auth
         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-        .requestMatchers("/api/auth/login").permitAll()       // explicit
+        .requestMatchers("/api/auth/login").permitAll()
         .requestMatchers("/api/auth/**").permitAll()
         .requestMatchers("/api/users/register").permitAll()
         .requestMatchers("/actuator/health").permitAll()
@@ -67,27 +67,27 @@ public class SecurityConfig {
 
   @Bean
   public DaoAuthenticationProvider authenticationProvider() {
-    var p = new DaoAuthenticationProvider();
-    p.setUserDetailsService(userDetailsService);
-    p.setPasswordEncoder(passwordEncoder());
-    return p;
+    var provider = new DaoAuthenticationProvider();
+    provider.setUserDetailsService(userDetailsService);
+    provider.setPasswordEncoder(passwordEncoder()); // <- This uses NoOpPasswordEncoder
+    return provider;
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration ac) throws Exception {
-    return ac.getAuthenticationManager();
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    return config.getAuthenticationManager();
   }
 
   @Bean
   public PasswordEncoder passwordEncoder() {
-    return NoOpPasswordEncoder.getInstance();
+    return NoOpPasswordEncoder.getInstance(); // <-- plain-text passwords (for dev/testing)
   }
 
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     var cfg = new CorsConfiguration();
     cfg.setAllowedOriginPatterns(List.of("*"));
-    cfg.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS","PATCH"));
+    cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
     cfg.setAllowedHeaders(List.of("*"));
     cfg.setAllowCredentials(false);
     var src = new UrlBasedCorsConfigurationSource();

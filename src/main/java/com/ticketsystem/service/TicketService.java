@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,9 +18,19 @@ public class TicketService {
     @Autowired
     private TicketRepository ticketRepository;
 
+    @Transactional
     public Ticket createTicket(CreateTicketRequest request, User owner) {
         Ticket ticket = new Ticket(request.getSubject(), request.getDescription(), request.getPriority(), owner);
-        return ticketRepository.save(ticket);
+        // attach optional issueId if provided
+        if (request.getIssueId() != null) {
+            ticket.setIssueId(request.getIssueId());
+        }
+        Ticket savedTicket = ticketRepository.save(ticket);
+        // Force initialization of lazy collections within transaction
+        if (savedTicket.getComments() != null) {
+            savedTicket.getComments().size(); // Trigger lazy loading
+        }
+        return savedTicket;
     }
 
     public Optional<Ticket> findById(Long id) {

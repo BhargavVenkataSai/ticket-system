@@ -156,7 +156,9 @@ public class AdminController {
     public ResponseEntity<DashboardStats> getDashboardStats() {
         DashboardStats stats = new DashboardStats();
         
-        stats.setTotalTickets(ticketService.countByStatus(null));
+        // Get total tickets count
+        List<Ticket> allTickets = ticketService.findAll();
+        stats.setTotalTickets(allTickets.size());
         stats.setOpenTickets(ticketService.countByStatus(Status.OPEN));
         stats.setInProgressTickets(ticketService.countByStatus(Status.IN_PROGRESS));
         stats.setResolvedTickets(ticketService.countByStatus(Status.RESOLVED));
