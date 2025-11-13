@@ -141,6 +141,8 @@ The system comes with pre-configured demo accounts:
 | `support` | `support123` | Support Agent | Can manage assigned tickets       |
 | `user`    | `user123`    | User          | Can create and manage own tickets |
 
+Note: The above displayed are demo and you need to change the usernames and passowrds accordigly when you work with this project
+
 ## API Endpoints
 
 ### Authentication

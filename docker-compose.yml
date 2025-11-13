@@ -7,7 +7,7 @@ services:
     restart: always
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: postgre1234
       POSTGRES_DB: ticket_system
     volumes:
       - ticket-system_postgres_data:/var/lib/postgresql/data

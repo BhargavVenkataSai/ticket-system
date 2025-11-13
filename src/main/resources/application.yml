@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/ticket_system
-    username: postgres
-    password: postgres
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/ticket_system}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgre1234}
   jpa:
     hibernate:
       ddl-auto: update
